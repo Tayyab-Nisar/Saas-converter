@@ -42,7 +42,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy files
-COPY package*.json/ ./
+COPY package*.json ./
 RUN npm install
 COPY . .
 
