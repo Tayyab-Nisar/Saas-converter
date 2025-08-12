@@ -38,16 +38,16 @@ RUN apt-get update && apt-get install -y \
   --no-install-recommends && \
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
+# Set working directory to backend
 WORKDIR /backend
 
 # Copy files
-COPY package.json ./
+COPY package.json ./backend/
 RUN npm install
-COPY . ./backend
+COPY . ./backend/
 
 # Expose port
 EXPOSE 3001
-WORKDIR /backend
+
 # Start the app
 CMD ["node", "index.js"]
