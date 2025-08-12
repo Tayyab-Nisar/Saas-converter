@@ -39,12 +39,12 @@ RUN apt-get update && apt-get install -y \
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
-WORKDIR /app
+WORKDIR /backend
 
 # Copy files
 COPY package.json ./
 RUN npm install
-COPY . .
+COPY . ./backend
 
 # Expose port
 EXPOSE 3001
