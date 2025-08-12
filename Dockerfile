@@ -38,16 +38,23 @@ RUN apt-get update && apt-get install -y \
   --no-install-recommends && \
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set working directory to backend
-WORKDIR /backend
+# Set the working directory to /app (this is where your code should live)
+WORKDIR /app
 
-# Copy files
-COPY package.json ./backend/
+# Copy package.json to the /app directory
+COPY package.json /app/
+
+# Install dependencies
 RUN npm install
-COPY . ./backend/
 
-# Expose port
+# Copy all project files to the container
+COPY . /app/
+
+# Expose the app port
 EXPOSE 3001
+
+# Set the correct working directory to where your application entry file (index.js) is located
+WORKDIR /app/backend
 
 # Start the app
 CMD ["node", "index.js"]
