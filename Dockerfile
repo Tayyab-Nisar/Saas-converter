@@ -48,6 +48,6 @@ COPY . .
 
 # Expose port
 EXPOSE 3001
-
+WORKDIR /backend
 # Start the app
 CMD ["node", "index.js"]
