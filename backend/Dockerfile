@@ -44,7 +44,7 @@ WORKDIR /app
 # Copy files
 COPY ./package*.json ./
 RUN npm install
-COPY . .
+COPY . ./app
 
 # Expose port
 EXPOSE 3001
