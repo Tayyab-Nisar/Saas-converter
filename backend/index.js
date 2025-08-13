@@ -23,7 +23,7 @@ app.post('/convert', async (req, res) => {
     // Convert Markdown to HTML
     const htmlContent = md.render(markdown);
 
-    // Wrap HTML content in basic HTML structure
+    // Wrap HTML in basic structure
     const fullHtml = `
       <!DOCTYPE html>
       <html>
@@ -38,15 +38,16 @@ app.post('/convert', async (req, res) => {
       </html>
     `;
 
-    // Launch puppeteer with no sandbox (needed on many servers)
+    // Launch puppeteer with explicit Chromium path
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
 
     const page = await browser.newPage();
     await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
 
-    // Generate PDF buffer (no file saved to disk)
+    // Generate PDF buffer
     const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
@@ -54,7 +55,7 @@ app.post('/convert', async (req, res) => {
 
     await browser.close();
 
-    // Send PDF file in response with proper headers
+    // Send PDF in response
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'attachment; filename=converted.pdf',
@@ -64,7 +65,10 @@ app.post('/convert', async (req, res) => {
     return res.send(pdfBuffer);
   } catch (error) {
     console.error('Error generating PDF:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({
+      error: 'Internal server error',
+      details: error.message
+    });
   }
 });
 
@@ -72,4 +76,3 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Markdown to PDF API listening on port ${PORT}`);
 });
-
