@@ -1,7 +1,8 @@
 FROM node:18-slim
 
-# Install Puppeteer dependencies
+# Install Chromium and Puppeteer dependencies
 RUN apt-get update && apt-get install -y \
+  chromium \
   libgbm1 \
   libnss3 \
   libatk-bridge2.0-0 \
@@ -19,45 +20,34 @@ RUN apt-get update && apt-get install -y \
   libepoxy0 \
   ca-certificates \
   fonts-liberation \
-  libasound2 \
-  libatk1.0-0 \
-  libatk-bridge2.0-0 \
-  libcups2 \
-  libdrm2 \
-  libgtk-3-0 \
   libnspr4 \
-  libnss3 \
   libx11-xcb1 \
-  libxcomposite1 \
-  libxdamage1 \
-  libxrandr2 \
-  libxss1 \
   libxtst6 \
   xdg-utils \
   wget \
   --no-install-recommends && \
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory to /app (this is where your code should live)
-WORKDIR /app
-
-# Copy package.json to the /app directory
-COPY package.json /app/
-
-# Install dependencies
-RUN npm install
-
-# Copy all project files to the container
-COPY . /app/
-
-# Tell Puppeteer where Chromium is
+# Set Puppeteer to use system Chromium
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# Expose the app port
-EXPOSE 3001
+# Main working directory
+WORKDIR /app
 
-# Set the correct working directory to where your application entry file (index.js) is located
+# Copy dependency files
+COPY package*.json /app/
+
+# Install Node.js dependencies
+RUN npm install
+
+# Copy the rest of the app
+COPY . /app/
+
+# Set backend working directory for running
 WORKDIR /app/backend
 
-# Start the app
+# Expose API port
+EXPOSE 3001
+
+# Start server
 CMD ["node", "index.js"]
