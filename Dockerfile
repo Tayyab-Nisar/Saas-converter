@@ -50,6 +50,9 @@ RUN npm install
 # Copy all project files to the container
 COPY . /app/
 
+# Tell Puppeteer where Chromium is
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
 # Expose the app port
 EXPOSE 3001
 
