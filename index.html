@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All-in-One PDF Converter</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>All-in-One PDF Converter</h1>
+  
+  <div class="container">
+    <!-- Text to PDF -->
+    <div class="card">
+      <h2>Text to PDF</h2>
+      <textarea id="textInput" placeholder="Enter text here..."></textarea>
+      <button onclick="convertText()">Convert</button>
+    </div>
+
+    <!-- Image to PDF -->
+    <div class="card">
+      <h2>Image to PDF</h2>
+      <input type="file" id="imageInput" accept="image/jpeg,image/png">
+      <button onclick="convertImage()">Convert</button>
+    </div>
+
+    <!-- Word to PDF -->
+    <div class="card">
+      <h2>Word to PDF</h2>
+      <input type="file" id="wordInput" accept=".doc,.docx">
+      <button onclick="convertWord()">Convert</button>
+    </div>
+  </div>
+
+  <script>
+    async function download(res, filename) {
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function convertText() {
+      const text = document.getElementById("textInput").value;
+      const res = await fetch("/convert-text", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      if (res.ok) download(res, "text.pdf");
+    }
+
+    async function convertImage() {
+      const file = document.getElementById("imageInput").files[0];
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await fetch("/convert-image", { method: "POST", body: formData });
+      if (res.ok) download(res, "image.pdf");
+    }
+
+    async function convertWord() {
+      const file = document.getElementById("wordInput").files[0];
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/convert-word", { method: "POST", body: formData });
+      if (res.ok) download(res, "document.pdf");
+    }
+  </script>
+</body>
+</html>
