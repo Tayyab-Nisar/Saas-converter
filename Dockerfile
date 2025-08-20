@@ -28,26 +28,29 @@ RUN apt-get update && apt-get install -y \
   --no-install-recommends && \
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set Puppeteer to use system Chromium
+# Puppeteer uses system Chromium
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Main working directory
 WORKDIR /app
 
-# Copy dependency files first
+# Copy dependency files (from root of project)
 COPY package*.json /app/
 
-# Install Node.js dependencies
+# Install Node.js dependencies in /app/node_modules
 RUN npm install
 
-# Copy the rest of the app
+# Copy the rest of the project
 COPY . /app/
 
-# Set backend working directory for running
+# ---- Fix: symlink node_modules so backend can access them ----
+RUN ln -s /app/node_modules /app/backend/node_modules
+
+# Set working directory to backend
 WORKDIR /app/backend
 
-# Expose API port
+# Expose backend API port
 EXPOSE 3001
 
-# Start server
+# Start backend
 CMD ["node", "index.js"]
