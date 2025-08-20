@@ -34,7 +34,7 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 # Main working directory
 WORKDIR /app
 
-# Copy dependency files
+# Copy dependency files first
 COPY package*.json /app/
 
 # Install Node.js dependencies
