@@ -1,6 +1,6 @@
 FROM node:18-slim
 
-# Install Chromium and Puppeteer dependencies
+# Install Chromium dependencies
 RUN apt-get update && apt-get install -y \
   chromium \
   libgbm1 \
@@ -28,29 +28,19 @@ RUN apt-get update && apt-get install -y \
   --no-install-recommends && \
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Puppeteer uses system Chromium
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# Main working directory
-WORKDIR /app
-
-# Copy dependency files (from root of project)
-COPY package*.json /app/
-
-# Install Node.js dependencies in /app/node_modules
-RUN npm install
-
-# Copy the rest of the project
-COPY . /app/
-
-# ---- Fix: symlink node_modules so backend can access them ----
-RUN ln -s /app/node_modules /app/backend/node_modules
-
-# Set working directory to backend
 WORKDIR /app/backend
 
-# Expose backend API port
+# Copy package.json for backend
+COPY backend/package*.json ./
+
+# Install backend dependencies (includes multer)
+RUN npm install
+
+# Copy backend source code
+COPY backend/ ./
+
 EXPOSE 3001
 
-# Start backend
 CMD ["node", "index.js"]
